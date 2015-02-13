@@ -25,7 +25,6 @@ import com.google.zxing.pdf417.encoder.Compaction;
 import com.google.zxing.pdf417.encoder.Dimensions;
 import com.google.zxing.pdf417.encoder.PDF417;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -68,10 +67,6 @@ public final class PDF417Writer implements Writer {
       }
       if (hints.containsKey(EncodeHintType.MARGIN)) {
         margin = ((Number) hints.get(EncodeHintType.MARGIN)).intValue();
-      }
-      if (hints.containsKey(EncodeHintType.CHARACTER_SET)) {
-        String encoding = (String) hints.get(EncodeHintType.CHARACTER_SET);
-        encoder.setEncoding(Charset.forName(encoding));
       }
     }
 

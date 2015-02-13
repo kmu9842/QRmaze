@@ -114,8 +114,8 @@ public final class RSSExpandedReader extends AbstractRSSReader {
 
   private static final int MAX_PAIRS = 11;
 
-  private final List<ExpandedPair> pairs = new ArrayList<>(MAX_PAIRS);
-  private final List<ExpandedRow> rows = new ArrayList<>();
+  private final List<ExpandedPair> pairs = new ArrayList<ExpandedPair>(MAX_PAIRS);
+  private final List<ExpandedRow> rows = new ArrayList<ExpandedRow>();
   private final int [] startEnd = new int[2];
   //private final int [] currentSequence = new int[LONGEST_SEQUENCE_SIZE];
   private boolean startFromEven = false;
@@ -234,7 +234,7 @@ public final class RSSExpandedReader extends AbstractRSSReader {
         return this.pairs;
       }
 
-      List<ExpandedRow> rs = new ArrayList<>();
+      List<ExpandedRow> rs = new ArrayList<ExpandedRow>();
       rs.addAll(collectedRows);
       rs.add(row);
       try {
@@ -359,7 +359,7 @@ public final class RSSExpandedReader extends AbstractRSSReader {
 
   // Only used for unit testing
   List<ExpandedRow> getRows() {
-    return this.rows;
+	  return this.rows;
   }
 
   // Not private for unit testing
@@ -639,7 +639,7 @@ public final class RSSExpandedReader extends AbstractRSSReader {
         }
         count = 8;
       }
-      int offset = i / 2;
+      int offset = i >> 1;
       if ((i & 0x01) == 0) {
         oddCounts[offset] = count;
         oddRoundingErrors[offset] = value - count;

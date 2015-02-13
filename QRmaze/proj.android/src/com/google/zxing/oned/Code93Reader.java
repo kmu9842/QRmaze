@@ -170,16 +170,20 @@ public final class Code93Reader extends OneDReader {
     }
     int pattern = 0;
     for (int i = 0; i < max; i++) {
-      int scaled = Math.round(counters[i] * 9.0f / sum);
-      if (scaled < 1 || scaled > 4) {
+      int scaledShifted = (counters[i] << INTEGER_MATH_SHIFT) * 9 / sum;
+      int scaledUnshifted = scaledShifted >> INTEGER_MATH_SHIFT;
+      if ((scaledShifted & 0xFF) > 0x7F) {
+        scaledUnshifted++;
+      }
+      if (scaledUnshifted < 1 || scaledUnshifted > 4) {
         return -1;
       }
       if ((i & 0x01) == 0) {
-        for (int j = 0; j < scaled; j++) {
+        for (int j = 0; j < scaledUnshifted; j++) {
           pattern = (pattern << 1) | 0x01;
         }
       } else {
-        pattern <<= scaled;
+        pattern <<= scaledUnshifted;
       }
     }
     return pattern;

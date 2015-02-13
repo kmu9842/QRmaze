@@ -32,7 +32,7 @@ public final class AztecCode {
   private BitMatrix matrix;
 
   /**
-   * @return {@code true} if compact instead of full mode
+   * Compact or full symbol indicator
    */
   public boolean isCompact() {
     return compact;
@@ -43,7 +43,7 @@ public final class AztecCode {
   }
 
   /**
-   * @return size in pixels (width and height)
+   * Size in pixels (width and height)
    */
   public int getSize() {
     return size;
@@ -54,7 +54,7 @@ public final class AztecCode {
   }
   
   /**
-   * @return number of levels
+   * Number of levels
    */
   public int getLayers() {
     return layers;
@@ -65,7 +65,7 @@ public final class AztecCode {
   }
 
   /**
-   * @return number of data codewords
+   * Number of data codewords
    */
   public int getCodeWords() {
     return codeWords;
@@ -76,7 +76,7 @@ public final class AztecCode {
   }
 
   /**
-   * @return the symbol image
+   * The symbol image
    */
   public BitMatrix getMatrix() {
     return matrix;

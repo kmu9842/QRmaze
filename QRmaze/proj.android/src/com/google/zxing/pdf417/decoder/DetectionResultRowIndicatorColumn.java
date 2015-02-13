@@ -16,7 +16,6 @@
 
 package com.google.zxing.pdf417.decoder;
 
-import com.google.zxing.FormatException;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.pdf417.PDF417Common;
 
@@ -111,7 +110,7 @@ final class DetectionResultRowIndicatorColumn extends DetectionResultColumn {
     return (int) (averageRowHeight + 0.5);
   }
 
-  int[] getRowHeights() throws FormatException {
+  int[] getRowHeights() {
     BarcodeMetadata barcodeMetadata = getBarcodeMetadata();
     if (barcodeMetadata == null) {
       return null;
@@ -120,12 +119,8 @@ final class DetectionResultRowIndicatorColumn extends DetectionResultColumn {
     int[] result = new int[barcodeMetadata.getRowCount()];
     for (Codeword codeword : getCodewords()) {
       if (codeword != null) {
-        int rowNumber = codeword.getRowNumber();
-        if (rowNumber >= result.length) {
-          throw FormatException.getFormatInstance();
-        }
-        result[rowNumber]++;
-      } // else throw exception?
+        result[codeword.getRowNumber()]++;
+      }
     }
     return result;
   }

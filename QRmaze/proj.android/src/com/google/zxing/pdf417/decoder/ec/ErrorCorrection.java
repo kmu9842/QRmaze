@@ -36,11 +36,7 @@ public final class ErrorCorrection {
   }
 
   /**
-   * @param received received codewords
-   * @param numECCodewords number of those codewords used for EC
-   * @param erasures location of erasures
    * @return number of errors
-   * @throws ChecksumException if errors cannot be corrected, maybe because of too many errors
    */
   public int decode(int[] received,
                     int numECCodewords,
@@ -62,13 +58,11 @@ public final class ErrorCorrection {
     }
 
     ModulusPoly knownErrors = field.getOne();
-    if (erasures != null) {
-      for (int erasure : erasures) {
-        int b = field.exp(received.length - 1 - erasure);
-        // Add (1 - bx) term:
-        ModulusPoly term = new ModulusPoly(field, new int[]{field.subtract(0, b), 1});
-        knownErrors = knownErrors.multiply(term);
-      }
+    for (int erasure : erasures) {
+      int b = field.exp(received.length - 1 - erasure);
+      // Add (1 - bx) term:
+      ModulusPoly term = new ModulusPoly(field, new int[] { field.subtract(0, b), 1 });
+      knownErrors = knownErrors.multiply(term);
     }
 
     ModulusPoly syndrome = new ModulusPoly(field, S);

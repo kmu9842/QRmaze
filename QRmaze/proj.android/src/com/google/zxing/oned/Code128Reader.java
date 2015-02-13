@@ -146,8 +146,8 @@ public final class Code128Reader extends OneDReader {
       {2, 3, 3, 1, 1, 1, 2}
   };
 
-  private static final float MAX_AVG_VARIANCE = 0.25f;
-  private static final float MAX_INDIVIDUAL_VARIANCE = 0.7f;
+  private static final int MAX_AVG_VARIANCE = (int) (PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.25f);
+  private static final int MAX_INDIVIDUAL_VARIANCE = (int) (PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.7f);
 
   private static final int CODE_SHIFT = 98;
 
@@ -181,10 +181,10 @@ public final class Code128Reader extends OneDReader {
         counters[counterPosition]++;
       } else {
         if (counterPosition == patternLength - 1) {
-          float bestVariance = MAX_AVG_VARIANCE;
+          int bestVariance = MAX_AVG_VARIANCE;
           int bestMatch = -1;
           for (int startCode = CODE_START_A; startCode <= CODE_START_C; startCode++) {
-            float variance = patternMatchVariance(counters, CODE_PATTERNS[startCode],
+            int variance = patternMatchVariance(counters, CODE_PATTERNS[startCode],
                 MAX_INDIVIDUAL_VARIANCE);
             if (variance < bestVariance) {
               bestVariance = variance;
@@ -214,11 +214,11 @@ public final class Code128Reader extends OneDReader {
   private static int decodeCode(BitArray row, int[] counters, int rowOffset)
       throws NotFoundException {
     recordPattern(row, rowOffset, counters);
-    float bestVariance = MAX_AVG_VARIANCE; // worst variance we'll accept
+    int bestVariance = MAX_AVG_VARIANCE; // worst variance we'll accept
     int bestMatch = -1;
     for (int d = 0; d < CODE_PATTERNS.length; d++) {
       int[] pattern = CODE_PATTERNS[d];
-      float variance = patternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE);
+      int variance = patternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE);
       if (variance < bestVariance) {
         bestVariance = variance;
         bestMatch = d;
@@ -241,7 +241,7 @@ public final class Code128Reader extends OneDReader {
     int[] startPatternInfo = findStartPattern(row);
     int startCode = startPatternInfo[2];
 
-    List<Byte> rawCodes = new ArrayList<>(20);
+    List<Byte> rawCodes = new ArrayList<Byte>(20);
     rawCodes.add((byte) startCode);
 
     int codeSet;
@@ -273,8 +273,6 @@ public final class Code128Reader extends OneDReader {
     int checksumTotal = startCode;
     int multiplier = 0;
     boolean lastCharacterWasPrintable = true;
-    boolean upperMode = false;
-    boolean shiftUpperMode = false;
 
     while (!done) {
 
@@ -318,19 +316,9 @@ public final class Code128Reader extends OneDReader {
 
         case CODE_CODE_A:
           if (code < 64) {
-            if (shiftUpperMode == upperMode) {
-              result.append((char) (' ' + code));
-            } else {
-              result.append((char) (' ' + code + 128));
-            }
-            shiftUpperMode = false;
+            result.append((char) (' ' + code));
           } else if (code < 96) {
-            if (shiftUpperMode == upperMode) {
-              result.append((char) (code - 64));
-            } else {
-              result.append((char) (code + 64));
-            }
-            shiftUpperMode = false;
+            result.append((char) (code - 64));
           } else {
             // Don't let CODE_STOP, which always appears, affect whether whether we think the last
             // code was printable or not.
@@ -352,18 +340,8 @@ public final class Code128Reader extends OneDReader {
                 break;
               case CODE_FNC_2:
               case CODE_FNC_3:
-                // do nothing?
-                break;
               case CODE_FNC_4_A:
-                if (!upperMode && shiftUpperMode) {
-                  upperMode = true;
-                  shiftUpperMode = false;
-                } else if (upperMode && shiftUpperMode) {
-                  upperMode = false;
-                  shiftUpperMode = false;
-                } else {
-                  shiftUpperMode = true;
-                }
+                // do nothing?
                 break;
               case CODE_SHIFT:
                 isNextShifted = true;
@@ -383,12 +361,7 @@ public final class Code128Reader extends OneDReader {
           break;
         case CODE_CODE_B:
           if (code < 96) {
-            if (shiftUpperMode == upperMode) {
-              result.append((char) (' ' + code));
-            } else {
-              result.append((char) (' ' + code + 128));
-            }
-            shiftUpperMode = false;
+            result.append((char) (' ' + code));
           } else {
             if (code != CODE_STOP) {
               lastCharacterWasPrintable = false;
@@ -408,18 +381,8 @@ public final class Code128Reader extends OneDReader {
                 break;
               case CODE_FNC_2:
               case CODE_FNC_3:
-                // do nothing?
-                break;
               case CODE_FNC_4_B:
-                if (!upperMode && shiftUpperMode) {
-                  upperMode = true;
-                  shiftUpperMode = false;
-                } else if (upperMode && shiftUpperMode) {
-                  upperMode = false;
-                  shiftUpperMode = false;
-                } else {
-                  shiftUpperMode = true;
-                }
+                // do nothing?
                 break;
               case CODE_SHIFT:
                 isNextShifted = true;

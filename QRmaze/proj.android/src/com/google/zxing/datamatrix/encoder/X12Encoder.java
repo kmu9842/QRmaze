@@ -72,12 +72,16 @@ final class X12Encoder extends C40Encoder {
     context.updateSymbolInfo();
     int available = context.getSymbolInfo().getDataCapacity() - context.getCodewordCount();
     int count = buffer.length();
-    context.pos -= count;
-    if (context.getRemainingCharacters() > 1 || available > 1 ||
-        context.getRemainingCharacters() != available) {
+    if (count == 2) {
       context.writeCodeword(HighLevelEncoder.X12_UNLATCH);
-    }
-    if (context.getNewEncoding() < 0) {
+      context.pos -= 2;
+      context.signalEncoderChange(HighLevelEncoder.ASCII_ENCODATION);
+    } else if (count == 1) {
+      context.pos--;
+      if (available > 1) {
+        context.writeCodeword(HighLevelEncoder.X12_UNLATCH);
+      }
+      //NOP - No unlatch necessary
       context.signalEncoderChange(HighLevelEncoder.ASCII_ENCODATION);
     }
   }

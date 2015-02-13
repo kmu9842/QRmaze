@@ -22,8 +22,6 @@ package com.google.zxing.pdf417.encoder;
 
 import com.google.zxing.WriterException;
 
-import java.nio.charset.Charset;
-
 /**
  * Top-level class for the logic part of the PDF417 implementation.
  */
@@ -515,7 +513,6 @@ public final class PDF417 {
   private BarcodeMatrix barcodeMatrix;
   private boolean compact;
   private Compaction compaction;
-  private Charset encoding;
   private int minCols;
   private int maxCols;
   private int maxRows;
@@ -528,7 +525,6 @@ public final class PDF417 {
   public PDF417(boolean compact) {
     this.compact = compact;
     compaction = Compaction.AUTO;
-    encoding = null; // Use default
     minCols = 2;
     maxCols = 30;
     maxRows = 30;
@@ -638,15 +634,15 @@ public final class PDF417 {
   }
 
   /**
-   * @param msg message to encode
-   * @param errorCorrectionLevel PDF417 error correction level to use
-   * @throws WriterException if the contents cannot be encoded in this format
+   * Generates the barcode logic.
+   *
+   * @param msg        the message to encode
    */
   public void generateBarcodeLogic(String msg, int errorCorrectionLevel) throws WriterException {
 
     //1. step: High-level encoding
     int errorCorrectionCodeWords = PDF417ErrorCorrection.getErrorCorrectionCodewordCount(errorCorrectionLevel);
-    String highLevel = PDF417HighLevelEncoder.encodeHighLevel(msg, compaction, encoding);
+    String highLevel = PDF417HighLevelEncoder.encodeHighLevel(msg, compaction);
     int sourceCodeWords = highLevel.length();
 
     int[] dimension = determineDimensions(sourceCodeWords, errorCorrectionCodeWords);
@@ -731,11 +727,6 @@ public final class PDF417 {
 
   /**
    * Sets max/min row/col values
-   *
-   * @param maxCols maximum allowed columns
-   * @param minCols minimum allowed columns
-   * @param maxRows maximum allowed rows
-   * @param minRows minimum allowed rows
    */
   public void setDimensions(int maxCols, int minCols, int maxRows, int minRows) {
     this.maxCols = maxCols;
@@ -745,24 +736,17 @@ public final class PDF417 {
   }
 
   /**
-   * @param compaction compaction mode to use
+   * Sets compaction to values stored in {@link Compaction} enum
    */
   public void setCompaction(Compaction compaction) {
     this.compaction = compaction;
   }
 
   /**
-   * @param compact if true, enables compaction
+   * Sets compact to be true or false
    */
   public void setCompact(boolean compact) {
     this.compact = compact;
-  }
-
-  /**
-   * @param encoding sets character encoding to use
-   */
-  public void setEncoding(Charset encoding) {
-    this.encoding = encoding;
   }
 
 }

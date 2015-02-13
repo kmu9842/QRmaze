@@ -81,7 +81,7 @@ public final class ErrorCorrection {
     for (int i = 0; i < 255; i++) {
       ALOG[i] = p;
       LOG[p] = i;
-      p *= 2;
+      p <<= 1;
       if (p >= 256) {
         p ^= MODULO_VALUE;
       }

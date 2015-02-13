@@ -59,10 +59,7 @@ final class DecodedBitStreamParser {
                               Map<DecodeHintType,?> hints) throws FormatException {
     BitSource bits = new BitSource(bytes);
     StringBuilder result = new StringBuilder(50);
-    List<byte[]> byteSegments = new ArrayList<>(1);
-    int symbolSequence = -1;
-    int parityData = -1;
-    
+    List<byte[]> byteSegments = new ArrayList<byte[]>(1);
     try {
       CharacterSetECI currentCharacterSetECI = null;
       boolean fc1InEffect = false;
@@ -83,10 +80,9 @@ final class DecodedBitStreamParser {
             if (bits.available() < 16) {
               throw FormatException.getFormatInstance();
             }
-            // sequence number and parity is added later to the result metadata
+            // not really supported; all we do is ignore it
             // Read next 8 bits (symbol sequence #) and 8 bits (parity data), then continue
-            symbolSequence = bits.readBits(8);
-            parityData = bits.readBits(8);
+            bits.readBits(16);
           } else if (mode == Mode.ECI) {
             // Count doesn't apply to ECI
             int value = parseECIValue(bits);
@@ -130,9 +126,7 @@ final class DecodedBitStreamParser {
     return new DecoderResult(bytes,
                              result.toString(),
                              byteSegments.isEmpty() ? null : byteSegments,
-                             ecLevel == null ? null : ecLevel.toString(),
-                             symbolSequence,
-                             parityData);
+                             ecLevel == null ? null : ecLevel.toString());
   }
 
   /**
@@ -217,7 +211,7 @@ final class DecodedBitStreamParser {
                                         Collection<byte[]> byteSegments,
                                         Map<DecodeHintType,?> hints) throws FormatException {
     // Don't crash trying to read more bits than we have available.
-    if (8 * count > bits.available()) {
+    if (count << 3 > bits.available()) {
       throw FormatException.getFormatInstance();
     }
 
