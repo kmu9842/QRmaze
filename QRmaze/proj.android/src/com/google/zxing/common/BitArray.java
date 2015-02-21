@@ -16,12 +16,14 @@
 
 package com.google.zxing.common;
 
+import java.util.Arrays;
+
 /**
  * <p>A simple, fast array of bits, represented compactly by an array of ints internally.</p>
  *
  * @author Sean Owen
  */
-public final class BitArray {
+public final class BitArray implements Cloneable {
 
   private int[] bits;
   private int size;
@@ -109,6 +111,8 @@ public final class BitArray {
   }
 
   /**
+   * @param from index to start looking for unset bit
+   * @return index of next unset bit, or {@code size} if none are unset until the end
    * @see #getNextSet(int)
    */
   public int getNextUnset(int from) {
@@ -235,6 +239,9 @@ public final class BitArray {
    * Appends the least-significant bits, from value, in order from most-significant to
    * least-significant. For example, appending 6 bits from 0x000001E will append the bits
    * 0, 1, 1, 1, 1, 0 in that order.
+   *
+   * @param value {@code int} containing bits to append
+   * @param numBits bits from value to append
    */
   public void appendBits(int value, int numBits) {
     if (numBits < 0 || numBits > 32) {
@@ -335,6 +342,20 @@ public final class BitArray {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof BitArray)) {
+      return false;
+    }
+    BitArray other = (BitArray) o;
+    return size == other.size && Arrays.equals(bits, other.bits);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * size + Arrays.hashCode(bits);
+  }
+
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder(size);
     for (int i = 0; i < size; i++) {
@@ -344,6 +365,11 @@ public final class BitArray {
       result.append(get(i) ? 'X' : '.');
     }
     return result.toString();
+  }
+
+  @Override
+  public BitArray clone() {
+    return new BitArray(bits.clone(), size);
   }
 
 }

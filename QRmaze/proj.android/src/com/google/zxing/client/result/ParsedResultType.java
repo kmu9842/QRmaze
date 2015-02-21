@@ -34,6 +34,7 @@ public enum ParsedResultType {
   SMS,
   CALENDAR,
   WIFI,
-  ISBN, VIN,
+  ISBN,
+  VIN,
 
 }

@@ -125,7 +125,7 @@ public final class PDF417ScanningDecoder {
 
   private static DetectionResult merge(DetectionResultRowIndicatorColumn leftRowIndicatorColumn,
                                        DetectionResultRowIndicatorColumn rightRowIndicatorColumn)
-      throws NotFoundException {
+      throws NotFoundException, FormatException {
     if (leftRowIndicatorColumn == null && rightRowIndicatorColumn == null) {
       return null;
     }
@@ -139,7 +139,7 @@ public final class PDF417ScanningDecoder {
   }
 
   private static BoundingBox adjustBoundingBox(DetectionResultRowIndicatorColumn rowIndicatorColumn)
-      throws NotFoundException {
+      throws NotFoundException, FormatException {
     if (rowIndicatorColumn == null) {
       return null;
     }
@@ -183,14 +183,16 @@ public final class PDF417ScanningDecoder {
 
   private static BarcodeMetadata getBarcodeMetadata(DetectionResultRowIndicatorColumn leftRowIndicatorColumn,
                                                     DetectionResultRowIndicatorColumn rightRowIndicatorColumn) {
-    if (leftRowIndicatorColumn == null || leftRowIndicatorColumn.getBarcodeMetadata() == null) {
+    BarcodeMetadata leftBarcodeMetadata;
+    if (leftRowIndicatorColumn == null ||
+        (leftBarcodeMetadata = leftRowIndicatorColumn.getBarcodeMetadata()) == null) {
       return rightRowIndicatorColumn == null ? null : rightRowIndicatorColumn.getBarcodeMetadata();
     }
-    if (rightRowIndicatorColumn == null || rightRowIndicatorColumn.getBarcodeMetadata() == null) {
-      return leftRowIndicatorColumn == null ? null : leftRowIndicatorColumn.getBarcodeMetadata();
+    BarcodeMetadata rightBarcodeMetadata;
+    if (rightRowIndicatorColumn == null ||
+        (rightBarcodeMetadata = rightRowIndicatorColumn.getBarcodeMetadata()) == null) {
+      return leftBarcodeMetadata;
     }
-    BarcodeMetadata leftBarcodeMetadata = leftRowIndicatorColumn.getBarcodeMetadata();
-    BarcodeMetadata rightBarcodeMetadata = rightRowIndicatorColumn.getBarcodeMetadata();
 
     if (leftBarcodeMetadata.getColumnCount() != rightBarcodeMetadata.getColumnCount() &&
         leftBarcodeMetadata.getErrorCorrectionLevel() != rightBarcodeMetadata.getErrorCorrectionLevel() &&
@@ -249,10 +251,10 @@ public final class PDF417ScanningDecoder {
       ChecksumException, NotFoundException {
     BarcodeValue[][] barcodeMatrix = createBarcodeMatrix(detectionResult);
     adjustCodewordCount(detectionResult, barcodeMatrix);
-    Collection<Integer> erasures = new ArrayList<Integer>();
+    Collection<Integer> erasures = new ArrayList<>();
     int[] codewords = new int[detectionResult.getBarcodeRowCount() * detectionResult.getBarcodeColumnCount()];
-    List<int[]> ambiguousIndexValuesList = new ArrayList<int[]>();
-    List<Integer> ambiguousIndexesList = new ArrayList<Integer>();
+    List<int[]> ambiguousIndexValuesList = new ArrayList<>();
+    List<Integer> ambiguousIndexesList = new ArrayList<>();
     for (int row = 0; row < detectionResult.getBarcodeRowCount(); row++) {
       for (int column = 0; column < detectionResult.getBarcodeColumnCount(); column++) {
         int[] values = barcodeMatrix[row][column + 1].getValue();
@@ -324,27 +326,31 @@ public final class PDF417ScanningDecoder {
     throw ChecksumException.getChecksumInstance();
   }
 
-  private static BarcodeValue[][] createBarcodeMatrix(DetectionResult detectionResult) {
-    BarcodeValue[][] barcodeMatrix = new BarcodeValue[detectionResult.getBarcodeRowCount()][detectionResult
-        .getBarcodeColumnCount() + 2];
+  private static BarcodeValue[][] createBarcodeMatrix(DetectionResult detectionResult) throws FormatException {
+    BarcodeValue[][] barcodeMatrix =
+        new BarcodeValue[detectionResult.getBarcodeRowCount()][detectionResult.getBarcodeColumnCount() + 2];
     for (int row = 0; row < barcodeMatrix.length; row++) {
       for (int column = 0; column < barcodeMatrix[row].length; column++) {
         barcodeMatrix[row][column] = new BarcodeValue();
       }
     }
 
-    int column = -1;
+    int column = 0;
     for (DetectionResultColumn detectionResultColumn : detectionResult.getDetectionResultColumns()) {
-      column++;
-      if (detectionResultColumn == null) {
-        continue;
-      }
-      for (Codeword codeword : detectionResultColumn.getCodewords()) {
-        if (codeword == null || codeword.getRowNumber() == -1) {
-          continue;
+      if (detectionResultColumn != null) {
+        for (Codeword codeword : detectionResultColumn.getCodewords()) {
+          if (codeword != null) {
+            int rowNumber = codeword.getRowNumber();
+            if (rowNumber >= 0) {
+              if (rowNumber >= barcodeMatrix.length) {
+                throw FormatException.getFormatInstance();
+              }
+              barcodeMatrix[rowNumber][column].setValue(codeword.getValue());
+            }
+          }
         }
-        barcodeMatrix[codeword.getRowNumber()][column].setValue(codeword.getValue());
       }
+      column++;
     }
     return barcodeMatrix;
   }
@@ -414,7 +420,7 @@ public final class PDF417ScanningDecoder {
     if (leftToRight) {
       endColumn = startColumn + codewordBitCount;
     } else {
-      for (int i = 0; i < moduleBitCount.length >> 1; i++) {
+      for (int i = 0; i < moduleBitCount.length / 2; i++) {
         int tmpCount = moduleBitCount[i];
         moduleBitCount[i] = moduleBitCount[moduleBitCount.length - 1 - i];
         moduleBitCount[moduleBitCount.length - 1 - i] = tmpCount;
@@ -612,7 +618,7 @@ public final class PDF417ScanningDecoder {
               barcodeValue.getConfidence(barcodeValue.getValue()[0]));
         }
       }
-      formatter.format("\n");
+      formatter.format("%n");
     }
     String result = formatter.toString();
     formatter.close();
