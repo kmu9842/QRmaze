@@ -25,6 +25,7 @@ import com.google.zxing.ResultPoint;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.clipboard.ClipboardInterface;
 import com.google.zxing.client.android.history.HistoryActivity;
+import com.google.zxing.client.android.history.HistoryItem;
 import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
@@ -400,10 +401,8 @@ public final class CaptureActivity extends Activity implements
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		Intent intentSubActivity = new Intent(CaptureActivity.this, Cocos2dxActivity.class);
-		startActivity(intentSubActivity);
-		
-		/*if (resultCode == RESULT_OK) {
+
+		if (resultCode == RESULT_OK) {
 			if (requestCode == HISTORY_REQUEST_CODE) {
 				int itemNumber = intent.getIntExtra(
 						Intents.History.ITEM_NUMBER, -1);
@@ -413,7 +412,7 @@ public final class CaptureActivity extends Activity implements
 					decodeOrStoreSavedBitmap(null, historyItem.getResult());
 				}
 			}
-		}*/
+		}
 	}
 
 	private void decodeOrStoreSavedBitmap(Bitmap bitmap, Result result) {
@@ -582,6 +581,7 @@ public final class CaptureActivity extends Activity implements
 				&& prefs.getBoolean(PreferencesActivity.KEY_AUTO_OPEN_WEB,
 						false)) {
 			resultHandler.handleButtonPress(resultHandler.getDefaultButtonID());
+
 			return;
 		}
 
@@ -648,6 +648,8 @@ public final class CaptureActivity extends Activity implements
 		int buttonCount = resultHandler.getButtonCount();
 		ViewGroup buttonView = (ViewGroup) findViewById(R.id.result_button_view);
 		buttonView.requestFocus();
+
+		// 결과창 버튼 표시
 		for (int x = 0; x < ResultHandler.MAX_BUTTON_COUNT; x++) {
 			TextView button = (TextView) buttonView.getChildAt(x);
 			if (x < buttonCount) {

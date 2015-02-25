@@ -16,14 +16,18 @@
 
 package com.google.zxing.client.android.result;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.LocaleManager;
 import com.QRmaze.kmu9842.R;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.URIParsedResult;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import java.util.Locale;
+
+import org.cocos2dx.lib.Cocos2dxActivity;
 
 /**
  * Offers appropriate actions for URLS.
@@ -38,7 +42,7 @@ public final class URIResultHandler extends ResultHandler {
   };
 
   private static final int[] buttons = {
-      R.string.button_open_browser,
+      R.string.button_start_maze,
       R.string.button_share_by_email,
       R.string.button_share_by_sms,
       R.string.button_search_book_contents,
@@ -72,7 +76,8 @@ public final class URIResultHandler extends ResultHandler {
     String uri = uriResult.getURI();
     switch (index) {
       case 0:
-        openURL(uri);
+    	openGame();
+        //openURL(uri);
         break;
       case 1:
         shareByEmail(uri);

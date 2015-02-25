@@ -123,7 +123,6 @@ public final class R {
         public static final int button_get_directions=0x7f0a000a;
         public static final int button_mms=0x7f0a000b;
         public static final int button_ok=0x7f0a000c;
-        public static final int button_open_browser=0x7f0a000d;
         public static final int button_product_search=0x7f0a000e;
         public static final int button_search_book_contents=0x7f0a000f;
         public static final int button_share_app=0x7f0a0010;
@@ -134,6 +133,7 @@ public final class R {
         public static final int button_share_contact=0x7f0a0015;
         public static final int button_show_map=0x7f0a0016;
         public static final int button_sms=0x7f0a0017;
+        public static final int button_start_maze=0x7f0a000d;
         public static final int button_web_search=0x7f0a0018;
         public static final int button_wifi=0x7f0a0019;
         public static final int contents_contact=0x7f0a001a;
