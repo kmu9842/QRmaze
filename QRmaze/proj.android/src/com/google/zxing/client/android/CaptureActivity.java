@@ -22,11 +22,13 @@ import com.google.zxing.DecodeHintType;
 import com.google.zxing.Result;
 import com.google.zxing.ResultMetadataType;
 import com.google.zxing.ResultPoint;
+import com.google.zxing.WriterException;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.clipboard.ClipboardInterface;
 import com.google.zxing.client.android.history.HistoryActivity;
 import com.google.zxing.client.android.history.HistoryItem;
 import com.google.zxing.client.android.history.HistoryManager;
+import com.google.zxing.client.android.result.QRCodeEncoder;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
@@ -569,6 +571,7 @@ public final class CaptureActivity extends Activity implements
 			ResultHandler resultHandler, Bitmap barcode) {
 
 		CharSequence displayContents = resultHandler.getDisplayContents();
+		Bitmap QRcodebitmap = null;
 
 		if (copyToClipboard && !resultHandler.areContentsSecure()) {
 			ClipboardInterface.setText(displayContents, this);
@@ -588,13 +591,27 @@ public final class CaptureActivity extends Activity implements
 		statusView.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE);
 		resultView.setVisibility(View.VISIBLE);
+		
+		// Make QR Code & Maze //
+		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(rawResult.getText(), null,
+				Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(),
+				300);
+		Log.i("", rawResult.getText());
+		try {
+			QRcodebitmap = qrCodeEncoder.encodeAsBitmap();
 
+		} catch (WriterException e) {
+			e.printStackTrace();
+		}
+		////////////////////////
+
+		
 		ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
 		if (barcode == null) {
 			barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(
 					getResources(), R.drawable.launcher_icon));
 		} else {
-			barcodeImageView.setImageBitmap(barcode);
+			barcodeImageView.setImageBitmap(QRcodebitmap);
 		}
 
 		TextView formatTextView = (TextView) findViewById(R.id.format_text_view);

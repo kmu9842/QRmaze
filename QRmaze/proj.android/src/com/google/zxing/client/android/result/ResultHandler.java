@@ -16,7 +16,9 @@
 
 package com.google.zxing.client.android.result;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
+import com.google.zxing.WriterException;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.Intents;
@@ -27,6 +29,8 @@ import com.google.zxing.client.android.book.SearchBookContentsActivity;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ParsedResultType;
 import com.google.zxing.client.result.ResultParser;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -34,11 +38,13 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Locale;
@@ -445,14 +451,16 @@ public abstract class ResultHandler {
 		putExtra(intent, Intents.SearchBookContents.ISBN, isbnOrUrl);
 		launchIntent(intent);
 	}
-	
-	final void openGame(){
+
+	final void openGame(String url) {
+		
+
 		Intent intent = new Intent(activity, AppActivity.class);
 		activity.startActivity(intent);
 	}
 
 	final void openURL(String url) {
-		
+
 		// Strangely, some Android browsers don't seem to register to handle
 		// HTTP:// or HTTPS://.
 		// Lower-case these as it should always be OK to lower-case these
