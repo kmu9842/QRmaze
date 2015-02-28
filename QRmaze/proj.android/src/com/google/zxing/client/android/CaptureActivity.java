@@ -41,6 +41,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -66,6 +67,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Collection;
@@ -591,11 +594,10 @@ public final class CaptureActivity extends Activity implements
 		statusView.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE);
 		resultView.setVisibility(View.VISIBLE);
-		
+
 		// Make QR Code & Maze //
-		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(rawResult.getText(), null,
-				Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(),
-				300);
+		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(rawResult.getText(),
+				null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), 300);
 		Log.i("", rawResult.getText());
 		try {
 			QRcodebitmap = qrCodeEncoder.encodeAsBitmap();
@@ -603,9 +605,21 @@ public final class CaptureActivity extends Activity implements
 		} catch (WriterException e) {
 			e.printStackTrace();
 		}
-		////////////////////////
 
-		
+		try {
+			File file = new File("assets\\Code.png");
+			FileOutputStream fos = openFileOutput("Code.png", 0);
+			QRcodebitmap.compress(CompressFormat.PNG, 100, fos);
+			fos.flush();
+			fos.close();
+
+			Toast.makeText(this, "file ok", Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+			Toast.makeText(this, "file error", Toast.LENGTH_SHORT).show();
+		}
+
+		// //////////////////////
+
 		ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
 		if (barcode == null) {
 			barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(
