@@ -63,7 +63,7 @@ bool HelloWorld::init()
     // add the label as a child to this layer
     this->addChild(label, 1);
 
-    auto sprite = Sprite::create("assets\\Code.png");
+    auto sprite = Sprite::create("assets\Code.png");
 
     // position the sprite on the center of the screen
     sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
