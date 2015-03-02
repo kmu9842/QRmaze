@@ -47,6 +47,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -605,21 +606,7 @@ public final class CaptureActivity extends Activity implements
 		} catch (WriterException e) {
 			e.printStackTrace();
 		}
-
-		try {
-			File file = new File("assets\\Code.png");
-			FileOutputStream fos = openFileOutput("Code.png", 0);
-			QRcodebitmap.compress(CompressFormat.PNG, 100, fos);
-			fos.flush();
-			fos.close();
-
-			Toast.makeText(this, "file ok", Toast.LENGTH_SHORT).show();
-		} catch (Exception e) {
-			Toast.makeText(this, "file error", Toast.LENGTH_SHORT).show();
-		}
-
-		// //////////////////////
-
+		
 		ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
 		if (barcode == null) {
 			barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(
@@ -627,6 +614,21 @@ public final class CaptureActivity extends Activity implements
 		} else {
 			barcodeImageView.setImageBitmap(QRcodebitmap);
 		}
+
+		try {
+			File file = new File(Environment.getExternalStorageDirectory().toString(), "Code.png");
+			Log.i("", Environment.getExternalStorageDirectory().toString());
+			FileOutputStream fos = new FileOutputStream(file);
+			QRcodebitmap.compress(CompressFormat.PNG, 100, fos);
+			fos.flush();
+			fos.close();
+
+			// Toast.makeText(this, "file ok", Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+			Toast.makeText(this, "file error", Toast.LENGTH_SHORT).show();
+		}
+
+		// //////////////////////
 
 		TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
 		formatTextView.setText(rawResult.getBarcodeFormat().toString());
