@@ -51,8 +51,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -597,8 +599,12 @@ public final class CaptureActivity extends Activity implements
 		resultView.setVisibility(View.VISIBLE);
 
 		// Make QR Code & Maze //
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics( metrics );
+		
 		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(rawResult.getText(),
-				null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), 300);
+				null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), metrics.heightPixels);
 		Log.i("", rawResult.getText());
 		try {
 			QRcodebitmap = qrCodeEncoder.encodeAsBitmap();
@@ -619,7 +625,9 @@ public final class CaptureActivity extends Activity implements
 			File file = new File(Environment.getExternalStorageDirectory().toString(), "Code.png");
 			Log.i("", Environment.getExternalStorageDirectory().toString());
 			FileOutputStream fos = new FileOutputStream(file);
+			
 			QRcodebitmap.compress(CompressFormat.PNG, 100, fos);
+			
 			fos.flush();
 			fos.close();
 
