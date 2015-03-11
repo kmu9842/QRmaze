@@ -64,7 +64,7 @@ bool HelloWorld::init() {
 
 	// add the label as a child to this layer
 	this->addChild(label, 1);
-	auto sprite = CCSprite::create("/storage/sdcard0/Code.png");
+	auto sprite = CCSprite::create("/storage/sdcard0/Android/data/com.QRmaze.kmu9842/QRcode/Code.png");
 	if (sprite) {
 		// position the sprite on the center of the screen
 		sprite->setPosition(

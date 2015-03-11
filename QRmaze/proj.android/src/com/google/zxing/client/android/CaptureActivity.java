@@ -622,7 +622,11 @@ public final class CaptureActivity extends Activity implements
 		}
 
 		try {
-			File file = new File(Environment.getExternalStorageDirectory().toString(), "Code.png");
+			File file = new File(Environment.getExternalStorageDirectory().toString() + "/Android/data/com.QRmaze.kmu9842/QRcode/", "Code.png");
+			File f = new File(Environment.getExternalStorageDirectory().toString() + "/Android/data/com.QRmaze.kmu9842/QRcode");
+			if( !f.exists() ){
+				f.mkdirs();
+			}
 			Log.i("", Environment.getExternalStorageDirectory().toString());
 			FileOutputStream fos = new FileOutputStream(file);
 			
